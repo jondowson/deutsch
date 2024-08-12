@@ -1,0 +1,72 @@
+#----------------------------------------------------
+function f_gender(){
+
+# Based on hierarchical rules, determine a noun's gender.
+# Determine gender by looking up in exception, monosyllable and intuitive arrays.
+# Then calculate gender based on the rules. 
+# If calculated gender is same as lookup or lookup does not exist then display the calculated path. 
+
+local target_word="${1}"
+local gender="";
+local stop="";
+local reason="";
+local lookup_gender="";
+local lookup_stop="";
+local lookup_reason="";
+local result="";
+local member_monosyllables="";
+local member_intuitive="";
+local member_exceptions="";
+declare -a functions;
+
+result=$(f_g0_monosyllables "${target_word}");
+if [[ "${result}" != ",," ]];then
+    lookup_gender="$(echo ${result} | cut -d ',' -f1)";
+    lookup_stop="$(echo   ${result} | cut -d ',' -f2)";
+    lookup_reason="$(echo ${result} | cut -d ',' -f3)";
+    member_monosyllables="true";
+fi;
+result=$(f_g0_intuitive "${target_word}");
+if [[ "${result}" != ",," ]];then
+    lookup_gender="$(echo ${result} | cut -d ',' -f1)";
+    lookup_stop="$(echo   ${result} | cut -d ',' -f2)";
+    lookup_reason="$(echo ${result} | cut -d ',' -f3)";
+    member_intuitive="true";
+fi;
+
+result=$(f_g0_exceptions "${target_word}");
+if [[ "${result}" != ",," ]];then
+    lookup_gender="$(echo ${result} | cut -d ',' -f1)";
+    lookup_stop="$(echo   ${result} | cut -d ',' -f2)";
+    lookup_reason="$(echo ${result} | cut -d ',' -f3)";
+    member_exceptions="true";
+fi;
+
+# List of function names
+functions=("f_g1" "f_g2" "f_g3" "f_g4" "f_g5");
+
+# Iterate through functions
+for func in "${functions[@]}"; do
+    result=$(${func} "${target_word}")
+    if [[ -n "${result}" ]] && [[ "${result}" != ",," ]]; then
+        gender="$(echo ${result} | cut -d ',' -f1)";
+        stop="$(echo   ${result} | cut -d ',' -f2)";
+        reason="$(echo ${result} | cut -d ',' -f3)";
+        break;
+    fi;
+done;
+
+#----------------------------------------------------
+# Check if gender gained from lookup arrays (always correct) is different to calculated gender.
+# If calculated gender is the same then display the calculated reason.
+
+if [[ "${lookup_gender}" != "" ]] && [[ "${lookup_gender}" != "${gender}" ]]; then
+    gender="${lookup_gender}";
+    gender_stop="${lookup_stop}";
+    gender_reason="${lookup_reason}";
+fi;
+
+#----------------------------------------------------
+# Return result string to calling code.
+echo "${gender},${stop},${reason}";
+};

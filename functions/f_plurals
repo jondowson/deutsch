@@ -1,0 +1,89 @@
+# -------------------------------------------
+function f_monopathway() {
+
+local target_word="${1}"
+local mono_gender="${2}";
+local mono_word="${3}";
+local result="";
+declare -a functions;
+
+# List of function names
+functions=("f_p1" "f_p2" "f_p3" "f_p4" "f_p5" "f_p6" "f_p7");
+
+# Iterate through functions
+for func in "${functions[@]}"; do
+    result=$(${func} "${target_word}" "mono" "${mono_gender}" "${mono_word}");
+    if [[ -n "${result}" ]] && [[ "${result}" != ",," ]]; then
+        echo "${result}";
+        break;
+    fi;
+done;
+};
+
+# -------------------------------------------
+function f_polypathway() {
+
+local target_word="${1}"
+local result="";
+declare -a functions;
+
+# List of function names
+functions=("f_p1" "f_p2" "f_p3" "f_p4" "f_p5" "f_p6" "f_p7");
+
+# Iterate through functions
+for func in "${functions[@]}"; do
+    result=$(${func} "${target_word}" "poly")
+    if [[ -n "${result}" ]] && [[ "${result}" != ",," ]]; then
+        echo "${result}";
+        break;
+    fi;
+done;
+};
+
+# -------------------------------------------
+function f_plurals() {
+
+local target_word="${1}"
+local lookup_plural="";
+local lookup_stop="";
+local lookup_reason="";
+local plural="";
+local stop="";
+local reason="";
+
+# First check if word is in an exception array.
+if [[ -n "${A_m_exceptions[${target_word}]}" ]];then 
+    lookup_stop="0";
+    lookup_reason="masculine exception";
+    lookup_plural=$(echo ${A_m_exceptions[${target_word}]});
+elif [[ -n "${A_f_exceptions[${target_word}]}" ]];then 
+    lookup_stop="0";
+    lookup_reason="feminine exception";
+    lookup_plural=$(echo ${A_f_exceptions[${target_word}]});
+elif [[ -n "${A_n_exceptions[${target_word}]}" ]];then 
+    lookup_stop="0";
+    lookup_reason="neuter exception";
+    lookup_plural=$(echo ${A_n_exceptions[${target_word}]});
+fi;
+
+pathway=$(f_is_mono "${target_word}");
+if [[ ${pathway} == "" ]]; then 
+    result=$(f_polypathway ${target_word} poly);
+else
+    mono_gender=$(echo ${pathway} | cut -d '_' -f1);
+    mono_word=$(echo ${pathway}   | cut -d '_' -f2);
+    result=$(f_monopathway ${target_word} ${mono_gender} ${mono_word});
+fi;
+
+plural="$(echo ${result} | cut -d ',' -f1)";
+stop="$(echo   ${result} | cut -d ',' -f2)";
+reason="$(echo ${result} | cut -d ',' -f3)";
+
+if [[ "${lookup_plural}" != "" ]] && [[ "${lookup_plural}" != "${plural}" ]]; then
+    plural="${lookup_plural}";
+    stop="${lookup_stop}";
+    reason="${lookup_reason}";
+fi;
+
+echo "${plural},${stop},${reason}";
+};

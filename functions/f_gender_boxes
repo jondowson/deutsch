@@ -1,0 +1,243 @@
+#----------------------------------------------------
+function f_g0_monosyllables(){
+
+local target_word="${1}";
+local gender="";
+local gender_stop="";
+local gender_reason="";
+
+# Extract the length of the target word
+target_length=${#target_word}
+
+for key in "${!A_m_monosyllables[@]}"; do
+    key_length=${#key}
+    # Compare the end of the target_word with the key
+    if [[ "${target_word: -$key_length}" == "$key" ]]; then
+        gender="masculine";
+        gender_stop="0m";
+        gender_reason="masculine monosyllable";
+        break;
+    fi
+done;
+if [[ "${gender}" == "" ]];then
+    for key in "${!A_f_monosyllables[@]}"; do
+        key_length=${#key}
+        if [[ "${target_word: -$key_length}" == "$key" ]]; then
+            gender="feminine";
+            gender_stop="0m";
+            gender_reason="feminine monosyllable";
+            break;
+        fi
+    done;
+fi;
+if [[ "${gender}" == "" ]];then
+    for key in "${!A_n_monosyllables[@]}"; do
+        key_length=${#key}
+        if [[ "${target_word: -$key_length}" == "$key" ]]; then
+            gender="neuter";
+            gender_stop="0m";
+            gender_reason="neuter monosyllable";
+            break;
+        fi
+    done;
+fi;
+echo "${gender},${gender_stop},${gender_reason}";
+};
+
+#----------------------------------------------------
+function f_g0_intuitive(){
+
+local target_word="${1}";
+local gender="";
+local gender_stop="";
+local gender_reason="";
+
+if [[ -n "${A_m_intuitive[${target_word}]}" ]]; then
+    gender="masculine";
+    gender_stop="0i";
+    gender_reason="masculine intuitive noun";
+elif [[ -n "${A_f_intuitive[${target_word}]}" ]]; then
+    gender="feminine";
+    gender_stop="0i";
+    gender_reason="feminine exception";
+elif [[ -n "${A_n_intuitive[${target_word}]}" ]]; then
+    gender="neuter";
+    gender_stop="0i";
+    gender_reason="neuter intuitive noun";
+fi;
+echo "${gender},${gender_stop},${gender_reason}";
+};
+
+#----------------------------------------------------
+function f_g0_exceptions(){
+
+local target_word="${1}";
+local gender="";
+local gender_stop="";
+local gender_reason="";
+
+if [[ -n "${A_m_exceptions[${target_word}]}" ]]; then
+    gender="masculine";
+    gender_stop="0e";
+    gender_reason="masculine exception";
+elif [[ -n "${A_f_exceptions[${target_word}]}" ]]; then
+    gender="feminine";
+    gender_stop="0e";
+    gender_reason="feminine exception";
+elif [[ -n "${A_n_exceptions[${target_word}]}" ]]; then
+    gender="neuter";
+    gender_stop="0e";
+    gender_reason="neuter exception";
+fi;
+echo "${gender},${gender_stop},${gender_reason}";
+};
+
+
+#----------------------------------------------------
+function f_g1(){
+
+local target_word="${1}";
+local gender="";
+local gender_stop="";
+local gender_reason="";
+
+if [[ "${target_word}" == *"chen" ]] || [[ "${target_word}" == *"lein" ]]; then
+    gender="neuter";
+    gender_stop="1";
+    gender_reason="neuter endings (-chen -lein)";
+elif [[ -n "${A_m_monosyllables[${target_word}]}"  ]]; then
+    gender="masculine";
+    gender_stop="1";
+    gender_reason="masculine monosyllable";
+elif [[ -n "${A_f_monosyllables[${target_word}]}"  ]]; then
+    gender="feminine";
+    gender_stop="1";
+    gender_reason="feminine monosyllable";
+elif [[ -n "${A_n_monosyllables[${target_word}]}"  ]]; then
+    gender="neuter";
+    gender_stop="1";
+    gender_reason="neuter monosyllable";
+fi;
+echo "${gender},${gender_stop},${gender_reason}";
+};
+
+#----------------------------------------------------  
+function f_g2(){
+
+local target_word="${1}";
+local gender="";
+local gender_stop="";
+local gender_reason="";
+       
+if [[ -n "${A_m_intuitive[${target_word}]}"  ]]; then
+    gender="masculine";
+    gender_stop="2";
+    gender_reason="masculine intuitive";
+elif [[ -n "${A_f_intuitive[${target_word}]}"  ]]; then
+    gender="feminine";
+    gender_stop="2";
+    gender_reason="feminine intuitive";
+elif [[ -n "${A_n_intuitive[${target_word}]}"  ]]; then
+    gender="neuter";
+    gender_stop="2";
+    gender_reason="neuter intuitive";
+fi;
+echo "${gender},${gender_stop},${gender_reason}";
+};
+
+#----------------------------------------------------
+function f_g3(){
+
+local target_word="${1}";
+local gender="";
+local gender_stop="";
+local gender_reason="";
+ 
+if [[ "${target_word}" == *"ag" ]]   || \
+    [[ "${target_word}" == *"eich" ]] || \
+    [[ "${target_word}" == *"ich" ]]  || \
+    [[ "${target_word}" == *"eig" ]]  || \
+    [[ "${target_word}" == *"ig" ]]   || \
+    [[ "${target_word}" == *"ling" ]]; then
+    gender="masculine";
+    gender_stop="3";
+    gender_reason="masculine ending (-ag -(e)ich -(e)ig -ling)";
+elif [[ "${target_word}" == *"il" ]]   || \
+    [[ "${target_word}" == *"ing" ]]; then
+    gender="neuter";
+    gender_stop="3";
+    gender_reason="neuter ending (-il,-ing)";
+elif [[ "${target_word}" == *"anz" ]]    || \
+    [[ "${target_word}" == *"enz" ]]    || \
+    [[ "${target_word}" == *"heit" ]]   || \
+    [[ "${target_word}" == *"keit" ]]   || \
+    [[ "${target_word}" == *"schaft" ]] || \
+    [[ "${target_word}" == *"tät" ]]    || \
+    [[ "${target_word}" == *"ung" ]]; then
+    gender="feminine";
+    gender_stop="3"; 
+    gender_reason="feminine ending (-anz -enz -heit -keit -schaft -tät -ung)";  
+fi;
+echo "${gender},${gender_stop},${gender_reason}";
+};
+
+#----------------------------------------------------
+function f_g4(){
+
+local target_word="${1}";
+local gender="";
+local gender_stop="";
+local gender_reason="";
+
+if [[ "${target_word}" == *"em" ]]    || \
+    [[ "${target_word}" == *"ier" ]]  || \
+    [[ "${target_word}" == *"ma" ]]   || \
+    [[ "${target_word}" == *"ment" ]] || \
+    [[ "${target_word}" == *"nis" ]]  || \
+    [[ "${target_word}" == *"um" ]]; then
+    gender="neuter"; 
+    gender_stop="4"; 
+    gender_reason="neuter ending (-em -ier -ma -ment -nis -um)"; 
+elif [[ "${target_word}" == *"and" ]] || \
+    [[ "${target_word}" == *"ant" ]]  || \
+    [[ "${target_word}" == *"end" ]]  || \
+    [[ "${target_word}" == *"ent" ]]  || \
+    [[ "${target_word}" == *"or" ]]   || \
+    [[ "${target_word}" == *"uss" ]]  || \
+    [[ "${target_word}" == *"us" ]]; then
+    gender="masculine";  
+    gender_stop="4";
+    gender_reason="masculine ending (-and -ant -end -ent -or -uss -us)";  
+fi;
+echo "${gender},${gender_stop},${gender_reason}";
+};
+
+#----------------------------------------------------
+function f_g5(){
+
+local target_word="${1}";
+local gender="";
+local gender_stop="";
+local gender_reason="";
+
+if [[ "${target_word}" == "ge"* ]]; then
+    gender="neuter";  
+    gender_stop="5";
+    gender_reason="neuter start letters (Ge-)";
+elif [[ "${target_word}" == *"el" ]]   || \
+    [[ "${target_word}" == *"en" ]]   || \
+    [[ "${target_word}" == *"er" ]]; then
+    gender="masculine";
+    gender_stop="5";
+    gender_reason="masculine ending letters (-el -er -en)";
+elif [[ "${target_word}" == *"e" ]]; then
+    gender="feminine";
+    gender_stop="5";  
+    gender_reason="feminine ending (-e)"; 
+else
+    gender="unknown";
+    gender_stop="unknown";  
+    gender_reason="no matches";    
+fi;
+echo "${gender},${gender_stop},${gender_reason}";
+};

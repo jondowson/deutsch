@@ -1,0 +1,131 @@
+function f_verbs_present_tense() {
+
+local verb_infinitive=$1;
+local verb_type=$2;
+local vowel_change=$3;
+
+# Remove 'en' from the infinitive form
+local stem="${verb_infinitive::-2}"; 
+local present_ich present_du present_er present_wir present_ihr present_sie;
+
+if [[ "$verb_type" == "strong" ]]; then
+    case "$vowel_change" in
+        a_ä)
+            present_ich="${stem}e";
+            present_du="${stem/a/ä}st";
+            present_er="${stem/a/ä}t";
+            ;;
+        e_i)
+            present_ich="${stem}e";
+            present_du="${stem/e/i}st";
+            present_er="${stem/e/i}t";
+            ;;
+        e_ie)
+            present_ich="${stem}e";
+            present_du="${stem/e/ie}st";
+            present_er="${stem/e/ie}t";
+            ;;
+        *)
+            present_ich="${stem}e";
+            present_du="${stem}st";
+            present_er="${stem}t";
+            ;;
+    esac;
+elif [[ "$verb_type" == "weak" || "$verb_type" == "mixed" ]]; then
+    present_ich="${stem}e";
+    present_du="${stem}st";
+    present_er="${stem}t";
+fi;
+
+present_wir="${verb_infinitive}";
+present_ihr="${stem}t";
+present_sie="${verb_infinitive}";
+
+echo "Ich $present_ich, du $present_du, er/sie/es $present_er, wir $present_wir, ihr $present_ihr, sie $present_sie";
+};
+
+#---------------------------------------------------
+
+function f_verbs_present_tense_oddballs() {
+
+local verb=$1;
+local oddball_conjugations="${A_verbs_oddballs[$verb]}";
+
+IFS=',' read -r base ich du er wir ihr sie <<< "$oddball_conjugations";
+echo "Ich $ich, du $du, er/sie/es $er, wir $wir, ihr $ihr, sie $sie";
+};
+
+#---------------------------------------------------
+
+function f_verbs_simple_past() {
+
+local verb=$1;
+local simple_past=$2;
+local verb_type=$3;
+
+# Strong verbs with exceptions
+if [[ "$verb_type" == "strong" ]]; then
+    case "$verb" in
+        sein)
+            echo "Ich war, du warst, er/sie/es war, wir waren, ihr wart, sie waren";
+            return;
+            ;;
+        haben)
+            echo "Ich hatte, du hattest, er/sie/es hatte, wir hatten, ihr hattet, sie hatten";
+            return;
+            ;;
+        werden)
+            echo "Ich wurde, du wurdest, er/sie/es wurde, wir wurden, ihr wurdet, sie wurden";
+            return;
+            ;;
+        halten)
+            echo "Ich hielt, du hieltst, er/sie/es hielt, wir hielten, ihr hieltet, sie hielten";
+            return;
+            ;;
+        *)
+            # General rule for strong verbs
+            echo "Ich ${simple_past}, du ${simple_past}st, er/sie/es ${simple_past}, wir ${simple_past}en, ihr ${simple_past}et, sie ${simple_past}en";
+            return;
+            ;;
+    esac;
+fi;
+
+# Default rule for weak and mixed verbs
+echo "Ich ${simple_past}e, du ${simple_past}st, er/sie/es ${simple_past}e, wir ${simple_past}en, ihr ${simple_past}et, sie ${simple_past}en";
+};
+
+#---------------------------------------------------
+
+f_verbs_perfect_past() {
+
+local aux_verb=$1
+local past_participle=$2
+if [[ "$aux_verb" == "sein" ]]; then
+    echo "Ich bin ${past_participle}, du bist ${past_participle}, er/sie/es ist ${past_participle}, wir sind ${past_participle}, ihr seid ${past_participle}, sie sind ${past_participle}"
+else
+    echo "Ich habe ${past_participle}, du hast ${past_participle}, er/sie/es hat ${past_participle}, wir haben ${past_participle}, ihr habt ${past_participle}, sie haben ${past_participle}"
+fi
+};
+
+#---------------------------------------------------
+
+f_verbs_future1() {
+    local verb_infinitive=$1
+    local stem="${verb_infinitive::-2}" # Remove 'en' from the infinitive form
+
+    echo "Ich werde $verb_infinitive, du wirst $verb_infinitive, er/sie/es wird $verb_infinitive, wir werden $verb_infinitive, ihr werdet $verb_infinitive, sie werden $verb_infinitive"
+};
+
+#---------------------------------------------------
+
+f_verbs_future2() {
+    local verb_infinitive=$1
+    local past_participle=$2
+
+    local auxiliary="haben"
+    if [[ "$verb_infinitive" == "sein" || "$verb_infinitive" == "werden" || "$verb_infinitive" == "gehen" ]]; then
+        auxiliary="sein"
+    fi
+
+    echo "Ich werde $past_participle $auxiliary, du wirst $past_participle $auxiliary, er/sie/es wird $past_participle $auxiliary, wir werden $past_participle $auxiliary, ihr werdet $past_participle $auxiliary, sie werden $past_participle $auxiliary"
+};

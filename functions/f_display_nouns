@@ -1,0 +1,82 @@
+function f_display_nouns(){
+# Display details about a noun.
+# Both actual and calculated values will be displayed.
+
+local gender="${1}";
+local noun="${2}";
+local english_meaning;
+local plural;
+local plural_calc;
+local plural_calc_result;
+local plural_calc_reason;
+local plural_calc_reason;
+local gender_calc;
+local gender_calc_result;
+local gender_calc_stop;
+local gender_calc_reason;
+local rss;
+
+if [[ "${gender}" == "masculine" ]];then
+    english_meaning=$(echo  "${A_m_nouns[$noun]}" | cut -d ',' -f 1); 
+    plural=$(echo           "${A_m_nouns[$noun]}" | cut -d ',' -f 2);
+    if [[ "${english_meaning}" == "" ]];then
+        english_meaning=$(echo  "${A_m_monosyllables[$noun]}" | cut -d ',' -f 1); 
+        plural=$(echo           "${A_m_monosyllables[$noun]}" | cut -d ',' -f 2); 
+    fi;
+elif [[ "${gender}" == "feminine" ]];then
+    english_meaning=$(echo  "${A_f_nouns[$noun]}" | cut -d ',' -f 1); 
+    plural=$(echo           "${A_f_nouns[$noun]}" | cut -d ',' -f 2);
+    if [[ "${english_meaning}" == "" ]];then
+        english_meaning=$(echo  "${A_f_monosyllables[$noun]}" | cut -d ',' -f 1); 
+        plural=$(echo           "${A_f_monosyllables[$noun]}" | cut -d ',' -f 2); 
+    fi;
+else
+    english_meaning=$(echo  "${A_n_nouns[$noun]}" | cut -d ',' -f 1); 
+    plural=$(echo           "${A_n_nouns[$noun]}" | cut -d ',' -f 2);
+    if [[ "${english_meaning}" == "" ]];then
+        english_meaning=$(echo  "${A_n_monosyllables[$noun]}" | cut -d ',' -f 1); 
+        plural=$(echo           "${A_n_monosyllables[$noun]}" | cut -d ',' -f 2); 
+    fi;
+fi;
+
+gender_calc=$(f_gender "${noun}"); 
+gender_calc_result=$(echo ${gender_calc} | cut -d ',' -f 1);
+gender_calc_stop=$(echo ${gender_calc}   | cut -d ',' -f 2);
+gender_calc_reason=$(echo ${gender_calc} | cut -d ',' -f 3);
+
+plural_calc=$(f_plurals  "${noun}"); 
+plural_calc_result=$(echo ${plural_calc} | cut -d ',' -f 1);
+plural_calc_stop=$(echo ${plural_calc}   | cut -d ',' -f 2);
+plural_calc_reason=$(echo ${plural_calc} | cut -d ',' -f 3);
+
+${spacer};
+printf "${cyB}Noun:                                %s\n" "${cy}${noun}${rs}";
+${dashLine};
+printf "${ylB}English meaning:                     %s\n" "${rs}${english_meaning//_/ or }";
+${dashLine};
+
+# Color display any mismatches for gender.
+if [[ "${gender}" == "${gender_calc_result}" ]];then
+    rss="${rs}";
+else
+    rss="${rd}";
+fi;
+
+printf "${whB}Gender (actual):                     %s\n" "${rs}${gender}";
+printf "${whB}Gender (calculated):                 %s\n" "${rss}${gender_calc_result}${rs}";
+printf "${whB}Gender bus-stop (calculated):        %s\n" "${rs}${gender_calc_stop} --> ${gender_calc_reason}";
+${dashLine}
+
+# Color display any mismatches for plural.
+if [[ "${plural}" == "${plural_calc_result}" ]];then
+    rss="${rs}";
+else
+    rss="${rd}";
+fi;
+
+printf "${ylB}Plural (actual):                     %s\n" "${rs}${plural}";
+printf "${ylB}Plural (calculated):                 %s\n" "${rss}${plural_calc_result}${rs}";
+printf "${ylB}Plural bus-stop (calculated):        %s\n" "${rs}${plural_calc_stop} --> ${plural_calc_reason}";
+${spacer};
+${equalsLine};
+};

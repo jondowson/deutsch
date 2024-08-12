@@ -1,0 +1,67 @@
+function f_display_verbs(){
+# Display details about a verb.
+# Both actual and calculated values will be displayed.
+
+#----------------------------------------------------
+local verb="${1}";
+local english_meaning;
+local verb_type;    
+local vowel_change; 
+local aux_verb;     
+local imperative_singular; 
+local imperative_plural; 
+local imperative_formal; 
+local past_participle; 
+local simple_past; 
+local present_tense;
+local simple_past_tense;
+local conjugated_auxiliary;
+local futur_1;
+local futur_2;
+
+#----------------------------------------------------
+english_meaning=$(echo     "${A_verbs[${verb}]}" | cut -d ',' -f 1); 
+verb_type=$(echo           "${A_verbs[${verb}]}" | cut -d ',' -f 2); 
+vowel_change=$(echo        "${A_verbs[${verb}]}" | cut -d ',' -f 3); 
+aux_verb=$(echo            "${A_verbs[${verb}]}" | cut -d ',' -f 4); 
+imperative_singular=$(echo "${A_verbs[${verb}]}" | cut -d ',' -f 5); 
+imperative_plural=$(echo   "${A_verbs[${verb}]}" | cut -d ',' -f 6); 
+imperative_formal=$(echo   "${A_verbs[${verb}]}" | cut -d ',' -f 7); 
+past_participle=$(echo     "${A_verbs[${verb}]}" | cut -d ',' -f 8); 
+simple_past=$(echo         "${A_verbs[${verb}]}" | cut -d ',' -f 9);
+
+#----------------------------------------------------
+if [[ -n "${A_verbs_oddballs[$verb]}" ]]; then
+    present_tense=$(f_verbs_present_tense_oddballs "${verb}");
+else
+    present_tense=$(f_verbs_present_tense "${verb}" "${verb_type}" "${vowel_change}");
+fi;
+simple_past_tense=$(f_verbs_simple_past "${verb}" "${simple_past}" "${verb_type}");
+conjugated_auxiliary=$(f_verbs_perfect_past "${aux_verb}" "${past_participle}");
+futur_1=$(f_verbs_future1 "${verb}");
+futur_2=$(f_verbs_future2 "${verb}" "${past_participle}");
+
+#----------------------------------------------------
+${spacer};
+printf "${cyB}Verb:                                %-15s\n" "${cy}${verb}${rs}";
+${dashLine};
+printf "${ylB}English meaning:                     %s\n" "${rs}to ${english_meaning//_/ or }";
+${dashLine};
+printf "${whB}Present tense:                       %s\n" "${rs}${present_tense}";
+${dashLine};
+printf "${ylB}Simple Past:                         %s\n" "${rs}${simple_past_tense}";
+${dashLine};
+printf "${whB}Perfect Tense:                       %s\n" "${rs}${conjugated_auxiliary}";
+${dashLine};
+printf "${ylB}Futur I:                             %s\n" "${rs}${futur_1}";
+${dashLine};
+printf "${whB}Futur II:                            %s\n" "${rs}${futur_2}";
+${dashLine};
+printf "${ylB}Imperative Informal Singular:        %s!\n" "${rs}${imperative_singular}";
+${dashLine};
+printf "${whB}Imperative Informal Plural:          %s!\n" "${rs}${imperative_plural}";
+${dashLine};
+printf "${ylB}Imperative Formal Singular:          %s Sie!\n" "${rs}${imperative_formal}";
+${spacer};
+${equalsLine};
+};  

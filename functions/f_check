@@ -1,0 +1,45 @@
+#----------------------------------------------------
+# Check if a word is a member of a noun list.
+# Matches are put into the array A_lookup_matches.
+
+f_check_noun() {
+local input="${1}";
+local array_name="${2}";
+local noun_value;
+local english_meaning;
+
+declare -n array_ref=$array_name;
+for noun_key in "${!array_ref[@]}"; do
+    noun_value=${array_ref[$noun_key]};
+    english_meaning=$(echo "${noun_value}" | cut -d ',' -f 1)
+
+    IFS='_' read -ra meanings <<< "${english_meaning}";
+    for meaning in "${meanings[@]}"; do
+        if [[ "${meaning}" == "${input}" || "${noun_key}" == "${input}" ]]; then
+            A_lookup_matches["${noun_key}"]="${noun_value}";
+        fi;
+    done;
+done;
+};
+
+#----------------------------------------------------
+# Check if a word is a member of a verb list.
+# Matches are put into the array A_lookup_matches.
+
+f_check_verb() {
+local input="${1}";
+local verb_value;
+local english_meaning;
+
+for verb_key in "${!A_verbs[@]}"; do
+    verb_value=${A_verbs[$verb_key]};
+    english_meaning=$(echo "${verb_value}" | cut -d ',' -f 1);
+
+    IFS='_' read -ra meanings <<< "${english_meaning}";
+    for meaning in "${meanings[@]}"; do
+        if [[ "${meaning}" == "${input}" || "${verb_key}" == "${input}" ]]; then
+            A_lookup_matches["${verb_key}"]="${verb_value}";
+        fi;
+    done;
+done;
+};

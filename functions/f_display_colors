@@ -1,0 +1,34 @@
+function f_display_colors(){
+
+dashLine=$(printf   "%s\n" "printf %b\n     "${rs}----------------------------------------------------------------------------------------"");
+plusLine=$(printf   "%s\n" "printf %b\n     "${rs}++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"");
+equalsLine=$(printf "%s\n" "printf %b\n     "${rs}========================================================================================"");
+tick=$(tput setaf 2 && printf "\xE2\x9C\x94" && tput sgr0);
+
+# reset color to terminal defaults.
+rs="$(tput init)";   
+# clear display.                       
+cl="$(tput clear && printf '\e[2J\e[3J\e[H')";   
+spacer=$(printf "%s\n" "printf %s\n """);
+
+# Standard colors.
+bk="$(tput setaf 0)";
+rd="$(tput setaf 1)";
+gr="$(tput setaf 2)";
+yl="$(tput setaf 3)";
+bl="$(tput setaf 4)";
+mg="$(tput setaf 5)";
+cy="$(tput setaf 6)";
+wh="$(tput setaf 7)";                       
+
+# Bold colors.
+bkB="$(tput bold; tput setaf 0)";
+rdB="$(tput bold; tput setaf 1)";
+grB="$(tput bold; tput setaf 2)";
+ylB="$(tput bold; tput setaf 3)";
+blB="$(tput bold; tput setaf 4)";
+mgB="$(tput bold; tput setaf 5)";
+cyB="$(tput bold; tput setaf 6)";
+whB="$(tput bold; tput setaf 7)";
+bold="$(tput bold)";
+};

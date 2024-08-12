@@ -1,0 +1,266 @@
+# -------------------------------------------
+function f_p1() {
+
+local target_word="${1}";
+local plural_stop="";
+local plural_stop_desc="";
+local plural_word="";
+
+if [[ "${target_word}" == *"eich" ]] || \
+    [[ "${target_word}" == *"ich" ]] || \
+    [[ "${target_word}" == *"eig" ]] || \
+    [[ "${target_word}" == *"ig" ]]  || \
+    [[ "${target_word}" == *"ling" ]]; then
+    plural_stop="1";
+    plural_stop_desc="masculine ending (-(e)ich -(e)ig  -ling)";
+    plural_word="${target_word}e";
+elif [[ "${target_word}" == *"ier" ]]; then
+    plural_stop="1";
+    plural_stop_desc="neuter ending (-ier)";
+    plural_word="${target_word}e";
+elif [[ "${target_word}" == *"nis" ]]; then
+    plural_stop="1";
+    plural_stop_desc="neuter ending (-nis)";
+    plural_word="${target_word}se";
+fi;
+echo "${plural_word},${plural_stop},${plural_stop_desc}";
+};
+
+# -------------------------------------------
+function f_p2() {
+
+local target_word="${1}";
+local plural_stop="";
+local plural_stop_desc="";
+local plural_word="";
+
+if [[ "${target_word}" == *"a" ]]  || \
+    [[ "${target_word}" == *"é" ]] || \
+    [[ "${target_word}" == *"i" ]] || \
+    [[ "${target_word}" == *"o" ]] || \
+    [[ "${target_word}" == *"u" ]] || \
+    [[ "${target_word}" == *"y" ]]; then
+    plural_stop="2";
+    plural_stop_desc="neuter ending (-a -é -i -o -u -y)";
+    plural_word="${target_word}s";
+    # TODO - acronyms
+fi;
+echo "${plural_word},${plural_stop},${plural_stop_desc}";
+};
+
+# -------------------------------------------
+function f_p3() {
+
+local target_word="${1}";
+local mono_poly="${2}";
+local mono_gender="${3}";
+local mono_word="${4}";
+local plural_stop="";
+local plural_stop_desc="";
+local plural_word="";
+
+if [[ "${mono_poly}" == "mono" ]];then
+    plural_stop="m2a";
+else
+    plural_stop="p3";
+fi;
+
+if [[ "${target_word}" == *"and" ]]    || \
+    [[ "${target_word}" == *"ant" ]] || \
+    [[ "${target_word}" == *"or" ]]  || \
+    [[ "${target_word}" == *"us" ]]; then    
+    plural_stop_desc="masculine ending (-and -ant -or -us)";
+    if [[ "${target_word}" == *"e" ]]; then
+        plural_word="${target_word}n";
+    else
+        plural_word="${target_word}en";
+    fi;
+elif [[ "${target_word}" == *"um" ]]; then
+
+    plural_stop_desc="neuter ending (-um)"
+    plural_word="${target_word%um}";
+    plural_word="${plural_word}en";
+elif [[ -n "${A_f_nouns[${target_word}]}" ]]; then 
+
+    plural_stop_desc="feminine noun";
+    if [[ -n "${A_f_intuitive[${target_word}]}" ]]; then
+        plural_word="$(echo ${A_f_intuitive[${target_word}]} | cut -d ',' -f 2)";
+    elif [[ "${target_word}" == *"e" ]]; then
+        plural_word="${target_word}n";
+    elif [[ "${target_word}" == *"in" ]]; then
+        plural_word="${target_word}nen";
+    else
+        plural_word="${target_word}en";
+    fi;
+fi;
+if [[ "${plural_word}" != "" ]];then
+    echo "${plural_word},${plural_stop},${plural_stop_desc}";
+else
+    echo "";
+fi;
+};
+
+# -------------------------------------------
+function f_p4() {
+
+local target_word="${1}";
+local mono_poly="${2}";
+local mono_gender="${3}";
+local mono_word="${4}";
+local plural_stop="";
+local plural_stop_desc="";
+local plural_word="";    
+
+if [[ "${mono_poly}" == "mono" ]];then
+    
+    # word is masculine
+    if [[ "${mono_gender}" == "m" ]];then
+        plural_stop="m2b";
+        plural_stop_desc="masculine monosyllable";
+        # Replace the first occurrence of a/o/u with ä/ö/ü
+        plural_word=$(echo "${target_word}" | sed -e 's/a/ä/' -e 's/o/ö/' -e 's/u/ü/');
+        plural_word="${plural_word}e";
+
+    # word is neuter
+    elif [[ "${mono_gender}" == "n" ]];then
+        plural_stop="m2c";
+        plural_stop_desc="neuter monosyllable";
+        plural_word=$(echo "${target_word}" | sed -e 's/a/ä/' -e 's/o/ö/' -e 's/u/ü/');
+        plural_word="${plural_word}er";
+    fi;
+else
+    plural_stop="p4";
+    if [[ "${target_word}" == *"el" ]]  || \
+        [[ "${target_word}" == *"en" ]] || \
+        [[ "${target_word}" == *"er" ]]; then
+        plural_stop_desc="masculine ending (-el -en -er)";
+        plural_word="${target_word}";
+    elif [[ "${target_word}" == *"chen" ]] || \
+        [[ "${target_word}" == *"lein" ]]; then
+        plural_stop_desc="neuter ending (-chen -lein)";
+        plural_word="${target_word}";
+    elif [[ "${target_word}" == ge* ]] && [[ "${target_word}" == *"e" ]]; then
+        plural_stop_desc="neuter start and end 'Ge-' + '-e'";
+        plural_word="${target_word}";
+    fi;
+fi;
+if [[ "${plural_word}" != "" ]];then
+    echo "${plural_word},${plural_stop},${plural_stop_desc}";
+else
+    echo "";
+fi;
+};
+
+# -------------------------------------------
+function f_p5() {
+
+local target_word="${1}";
+local plural_stop="";
+local plural_stop_desc="";
+local plural_word="";    
+
+if [[ "${target_word}" == *"ag" ]]   || \
+    [[ "${target_word}" == *"ast" ]] || \
+    [[ "${target_word}" == *"end" ]] || \
+    [[ "${target_word}" == *"ent" ]] || \
+    [[ "${target_word}" == *"uss" ]]; then
+    plural_stop="p5";
+    plural_stop_desc="masculine noun ending (-ag -ast -end -ent -uss)";
+    if [[ "${target_word}" == *"e" ]]; then
+        plural_word="${target_word}n";
+    else
+        plural_word="${target_word}en";
+    fi;
+
+# Check for inclusion in the masculine intuitive and noun groups and exclusion from the loanwords groups.        
+elif { [[ -n "${A_m_intuitive[${target_word}]}" ]] || \
+    [[ -n "${A_m_nouns[${target_word}]}"   ]]; }   && \
+    [[ -z "${A_loanwords_english[${target_word}]}" ]]  && \
+    [[ -z "${A_loanwords_french[${target_word}]}"  ]]; then
+    plural_stop="p5";
+    plural_stop_desc="masculine intuitive noun";
+    if [[ -n "${A_m_intuitive[${target_word}]}" ]];then
+        plural_word="$(echo ${A_m_intuitive[${target_word}]} | cut -d ',' -f 2)";
+    elif [[ "${target_word}" == *"e" ]]; then
+        plural_word="${target_word}n";
+    else
+        plural_word="${target_word}en";
+    fi;
+fi;
+echo "${plural_word},${plural_stop},${plural_stop_desc}";
+};
+
+# -------------------------------------------
+function f_p6() {
+
+local target_word="${1}";
+local mono_poly="${2}";
+local mono_gender="${3}";
+local mono_word="${4}";
+local plural_stop="";
+local plural_stop_desc="";
+local plural_word="";    
+
+if [[ "${mono_poly}" == "mono" ]];then
+    plural_stop="m1";
+else
+    plural_stop="p6";
+fi;
+
+if [[ -n "${A_loanwords_english[${target_word}]}" ]] || [[ -n "${A_loanwords_french[${target_word}]}" ]]; then
+    plural_stop_desc="French and English loan words";
+    plural_word="${target_word}s";
+fi;
+if [[ "${plural_word}" != "" ]];then
+    echo "${plural_word},${plural_stop},${plural_stop_desc}";
+else
+    echo "";
+fi;
+};
+
+# -------------------------------------------
+function f_p7() {
+
+local plural_stop="";
+local plural_stop_desc="";
+local plural_word="";
+
+plural_stop="p7";
+plural_stop_desc="default plural form";
+plural_word="${target_word}e";
+echo "${plural_word},${plural_stop},${plural_stop_desc}";
+};
+
+# -------------------------------------------
+function f_is_mono() {
+
+# Determines whether to use mono or poly pathway.
+# A previous function determines if the word itself is a monosyllable.
+# This function returns a blank string if the word does not contain a monosyllable ending.
+# In this case the poly pathway functions are used.
+
+local target_word="${1}"
+local mono="";
+local result="";
+
+for mono in ${!A_m_monosyllables[@]};do
+    if [[ "${target_word}" == *"${mono}" ]];then
+        result="m_${mono}";    
+    fi;
+done;
+if [[ "${result}" == "" ]];then
+    for mono in ${!A_f_monosyllables[@]};do
+        if [[ "${target_word}" == *"${mono}" ]];then
+            result="f_${mono}";
+        fi;
+    done;
+fi;
+if [[ "${result}" == "" ]];then
+    for mono in ${!A_n_monosyllables[@]};do
+        if [[ "${target_word}" == *"${mono}" ]];then
+            result="n_${mono}";
+        fi;
+    done;
+fi;
+echo "${result}";
+};
